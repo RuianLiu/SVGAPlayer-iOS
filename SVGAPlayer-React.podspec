@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
-  s.name         = "SVGAPlayer"
-  s.version      = "2.3.5"
+  s.name         = "SVGAPlayer-iOS"
+  s.version      = "1.0.0" # 在源代码2.5.6代码上修改
   s.summary      = "SVGAPlayer 是一个高性能的动画播放器"
   s.description  = <<-DESC
                    SVGA 是一个私有的动画格式，由 YY UED 主导开发。
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.license      = "Private"
   s.author       = { "PonyCui" => "cuiminghui1@yy.com" }
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/yyued/SVGAPlayer-iOS.git", :tag => s.version }
+  s.source       = { :git => "https://github.com/RuianLiu/SVGAPlayer-iOS.git", :tag => s.version }
   s.subspec 'Core' do |ss|
     ss.source_files  = "Source/*.{h,m}", "React/*.{h,m}"
     ss.requires_arc = true
