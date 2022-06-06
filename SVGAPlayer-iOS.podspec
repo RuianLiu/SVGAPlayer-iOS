@@ -9,10 +9,10 @@ Pod::Spec.new do |s|
                    SVGA 可以在 iOS / Android / Web / Flutter 实现高性能的动画播放。
                    DESC
 
-  s.homepage     = "http://code.yy.com/ued/SVGAPlayer"
+  s.homepage     = "https://github.com/RuianLiu"
   s.license      = "Apache 2.0"
   s.author       = { "PonyCui" => "cuiminghui1@yy.com" }
-  s.platform     = :ios, "7.0"
+  s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/RuianLiu/SVGAPlayer-iOS.git", :tag => s.version }
   s.subspec 'Core' do |ss|
     ss.source_files  = "Source/*.{h,m}"
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
     ss.dependency 'SSZipArchive', '>= 1.8.1'
     ss.library = "z"
     ss.framework = "AVFoundation"
-    ss.dependency 'SVGAPlayer/ProtoFiles'
+    ss.dependency 'SVGAPlayer-iOS/ProtoFiles'
   end
   s.subspec 'ProtoFiles' do |ss|
     ss.source_files  = "Source/pbobjc/*.{h,m}"
