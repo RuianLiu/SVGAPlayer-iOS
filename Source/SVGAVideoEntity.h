@@ -36,6 +36,10 @@
 - (void)saveCache:(NSString *)cacheKey;
 // NSMapTable弱缓存
 - (void)saveWeakCache:(NSString *)cacheKey;
+
+- (void)clearCache:(NSString *)cacheKey;
++ (void)clearCache:(NSString *)cacheKey;
+
 @end
 
 

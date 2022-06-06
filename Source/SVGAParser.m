@@ -48,15 +48,17 @@ static NSOperationQueue *unzipQueue;
         }
         return;
     }
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[self cacheDirectory:[self cacheKey:URLRequest.URL]]]) {
-        [self parseWithCacheKey:[self cacheKey:URLRequest.URL] completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
+    
+    NSString *cacheKeyMD5 = [self cacheKey:URLRequest.URL];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self cacheDirectory:cacheKeyMD5]]) {
+        [self parseWithCacheKey:cacheKeyMD5 completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
             if (completionBlock) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     completionBlock(videoItem);
                 }];
             }
         } failureBlock:^(NSError * _Nonnull error) {
-            [self clearCache:[self cacheKey:URLRequest.URL]];
+            [self clearCache:cacheKeyMD5];
             if (failureBlock) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     failureBlock(error);
@@ -65,22 +67,32 @@ static NSOperationQueue *unzipQueue;
         }];
         return;
     }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self SVGADataCacheFilePath:cacheKeyMD5]]) {
+        [self parseLocalSVGADataWithCacheKey:cacheKeyMD5 completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
+            if (completionBlock) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    completionBlock(videoItem);
+                }];
+            }
+        } failureBlock:^(NSError * _Nonnull error) {
+            [self clearLocalSVGADataCache:cacheKeyMD5];
+            if (failureBlock) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    failureBlock(error);
+                }];
+            }
+        }];
+        return;
+    }
+    
+    // 网络请求SVGAData
+    __weak typeof(self) weakSelf = self;
     [[[NSURLSession sharedSession] dataTaskWithRequest:URLRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error == nil && data != nil) {
-            [self parseWithData:data cacheKey:[self cacheKey:URLRequest.URL] completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
-                if (completionBlock) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        completionBlock(videoItem);
-                    }];
-                }
-            } failureBlock:^(NSError * _Nonnull error) {
-                [self clearCache:[self cacheKey:URLRequest.URL]];
-                if (failureBlock) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        failureBlock(error);
-                    }];
-                }
-            }];
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            [strongSelf parseWithSVGAData:data cacheKey:cacheKeyMD5 completionBlock:completionBlock failureBlock:failureBlock];
+            [strongSelf saveToLocalWithSVGAData:data cacheKey:cacheKeyMD5];
         }
         else {
             if (failureBlock) {
@@ -90,6 +102,24 @@ static NSOperationQueue *unzipQueue;
             }
         }
     }] resume];
+}
+
+- (void)parseWithSVGAData:(NSData *)data cacheKey:(NSString *)cacheKey completionBlock:(void (^)(SVGAVideoEntity * _Nullable))completionBlock failureBlock:(void (^)(NSError * _Nullable))failureBlock {
+    [self parseWithData:data cacheKey:cacheKey completionBlock:^(SVGAVideoEntity * _Nonnull videoItem) {
+        if (completionBlock) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                completionBlock(videoItem);
+            }];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        [self clearCache:cacheKey];
+        [self clearLocalSVGADataCache:cacheKey];
+        if (failureBlock) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                failureBlock(error);
+            }];
+        }
+    }];
 }
 
 - (void)parseWithNamed:(NSString *)named
@@ -249,6 +279,7 @@ static NSOperationQueue *unzipQueue;
                 }
             } failureBlock:^(NSError * _Nonnull error) {
                 [self clearCache:cacheKey];
+                [self clearLocalSVGADataCache:cacheKey];
                 if (failureBlock) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         failureBlock(error);
@@ -415,6 +446,92 @@ static NSOperationQueue *unzipQueue;
         return [NSData dataWithData: decompressed];
     }
     else return nil;
+}
+
+#pragma mark - Customer 方法
+- (void)parseLocalSVGADataWithCacheKey:(nonnull NSString *)cacheKey
+          completionBlock:(void ( ^ _Nullable)(SVGAVideoEntity * _Nonnull videoItem))completionBlock
+             failureBlock:(void ( ^ _Nullable)(NSError * _Nonnull error))failureBlock {
+        SVGAVideoEntity *cacheItem = [SVGAVideoEntity readCache:cacheKey];
+        if (cacheItem != nil) {
+            if (completionBlock) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    completionBlock(cacheItem);
+                }];
+            }
+            return;
+        }
+        // 读取本地SVGAData缓存
+        NSData *data = [self readLocalSVGADataWithCacheKey:cacheKey];
+        if (data != nil) {
+            [self parseWithSVGAData:data cacheKey:cacheKey completionBlock:completionBlock failureBlock:failureBlock];
+            return;
+        }
+}
+
+-  (nullable NSString *)SVGADataCacheFilePath:(NSString *)cacheKey {
+    NSString *SVGADataCacheDir = [self SVGADataCacheDirectory];
+    if (![[NSFileManager defaultManager] fileExistsAtPath: SVGADataCacheDir]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:SVGADataCacheDir withIntermediateDirectories:NO attributes:nil error:nil];
+    }
+    return [SVGADataCacheDir stringByAppendingFormat:@"/%@", cacheKey];
+}
+
+- (nullable NSString *)SVGADataCacheDirectory {
+    return [[self diskCacheDirectory] stringByAppendingFormat:@"/SVGA_data_cache"];
+}
+
+- (nullable NSString *)diskCacheDirectory {
+    return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];;
+}
+
+/** 保存二进制SVGAData到本地
+ *
+ */
+- (void)saveToLocalWithSVGAData:(NSData *)data cacheKey:(NSString *)cacheKey {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[self SVGADataCacheFilePath:cacheKey]]) {
+        [data writeToFile:[self SVGADataCacheFilePath:cacheKey] atomically:true];
+    }
+}
+
+/** 读取本地二进制 SVGAData
+ *
+ */
+- (NSData *)readLocalSVGADataWithCacheKey:(NSString *)cacheKey{
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[self SVGADataCacheFilePath:cacheKey]]) {
+        return [NSData dataWithContentsOfFile:[self SVGADataCacheFilePath:cacheKey]];
+    }
+    return nil;
+}
+
+- (void)clearLocalSVGADataCache:(nonnull NSString *)cacheKey {
+    NSString *cacheDir = [self SVGADataCacheFilePath:cacheKey];
+    [[NSFileManager defaultManager] removeItemAtPath:cacheDir error:NULL];
+}
+
+- (void)clearLocalSVGADataCacheWithURLString:(nonnull NSString *)URLString {
+    NSString *cacheDir = [self SVGADataCacheFilePath:[self MD5String:URLString]];
+    NSError *error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:cacheDir error:&error];
+}
+
+/** 下载SVGAData
+ *
+ */
+- (void)downloadSVGADataWithURLString:(NSString *)URLString {
+    [parseQueue addOperationWithBlock:^{
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:URLString]];
+        NSString *cacheKeyMD5 = [self MD5String:URLString];
+        // 读取本地SVGAData缓存
+        NSData *data = [self readLocalSVGADataWithCacheKey:cacheKeyMD5];
+        if (data == nil) {
+            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                if (error == nil && data != nil) {
+                    [self saveToLocalWithSVGAData:data cacheKey:cacheKeyMD5];
+                }
+            }] resume];
+        }
+    }];
 }
 
 @end

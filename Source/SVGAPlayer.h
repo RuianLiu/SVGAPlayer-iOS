@@ -37,6 +37,8 @@ typedef void(^SVGAPlayerDynamicDrawingBlock)(CALayer *contentLayer, NSInteger fr
 - (void)clear;
 - (void)stepToFrame:(NSInteger)frame andPlay:(BOOL)andPlay;
 - (void)stepToPercentage:(CGFloat)percentage andPlay:(BOOL)andPlay;
+- (void)clearVideoItem:(NSString *)cacheKey;
++ (void)clearVideoItem:(NSString *)cacheKey;
 
 #pragma mark - Dynamic Object
 

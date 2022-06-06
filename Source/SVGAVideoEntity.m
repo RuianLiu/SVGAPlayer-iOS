@@ -233,6 +233,24 @@ static dispatch_semaphore_t videoSemaphore;
     dispatch_semaphore_signal(videoSemaphore);
 }
 
+- (void)clearCache:(NSString *)cacheKey {
+    dispatch_semaphore_wait(videoSemaphore, DISPATCH_TIME_FOREVER);
+    [videoCache removeObjectForKey:cacheKey];
+    [weakCache removeObjectForKey:cacheKey];
+    dispatch_semaphore_signal(videoSemaphore);
+}
+
++ (void)clearCache:(NSString *)cacheKey {
+    dispatch_semaphore_wait(videoSemaphore, DISPATCH_TIME_FOREVER);
+    [videoCache removeObjectForKey:cacheKey];
+    [weakCache removeObjectForKey:cacheKey];
+    dispatch_semaphore_signal(videoSemaphore);
+}
+
+//- (void)dealloc {
+//    NSLog(@"=====  SVGAVideoEntity  =====");
+//}
+
 @end
 
 @interface SVGAVideoSpriteEntity()

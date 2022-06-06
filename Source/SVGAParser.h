@@ -32,4 +32,12 @@
        completionBlock:(void ( ^ _Nullable)(SVGAVideoEntity * _Nonnull videoItem))completionBlock
           failureBlock:(void ( ^ _Nullable)(NSError * _Nonnull error))failureBlock;
 
+- (NSString * _Nullable)MD5String:(nonnull NSString * )str;
+
+/** 下载SVGAData
+ *
+ */
+- (void)downloadSVGADataWithURLString:(nonnull NSString *)URLString;
+- (void)clearLocalSVGADataCacheWithURLString:(nonnull NSString *)URLString;
+
 @end

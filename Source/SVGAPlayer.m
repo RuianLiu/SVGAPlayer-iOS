@@ -71,7 +71,7 @@
 
 - (void)startAnimation {
     if (self.videoItem == nil) {
-        NSLog(@"videoItem could not be nil！");
+//        NSLog(@"videoItem could not be nil！");
         return;
     } else if (self.drawLayer == nil) {
         self.videoItem = _videoItem;
@@ -79,18 +79,22 @@
     [self stopAnimation:NO];
     self.loopCount = 0;
     if (self.videoItem.FPS == 0) {
-        NSLog(@"videoItem FPS could not be 0！");
+//        NSLog(@"videoItem FPS could not be 0！");
         return;
     }
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
-    self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+    if (@available(iOS 10.0, *)) {
+        self.displayLink.preferredFramesPerSecond = self.videoItem.FPS;
+    } else {
+        self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+    }
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
     self.forwardAnimating = !self.reversing;
 }
 
 - (void)startAnimationWithRange:(NSRange)range reverse:(BOOL)reverse {
     if (self.videoItem == nil) {
-        NSLog(@"videoItem could not be nil！");
+//        NSLog(@"videoItem could not be nil！");
         return;
     } else if (self.drawLayer == nil) {
         self.videoItem = _videoItem;
@@ -98,7 +102,7 @@
     [self stopAnimation:NO];
     self.loopCount = 0;
     if (self.videoItem.FPS == 0) {
-        NSLog(@"videoItem FPS could not be 0！");
+//        NSLog(@"videoItem FPS could not be 0！");
         return;
     }
     
@@ -112,7 +116,11 @@
     }
     self.forwardAnimating = !self.reversing;
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
-    self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+    if (@available(iOS 10.0, *)) {
+        self.displayLink.preferredFramesPerSecond = self.videoItem.FPS;
+    } else {
+        self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+    }
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
 }
 
@@ -142,6 +150,16 @@
     self.drawLayer = nil;
 }
 
+- (void)clearVideoItem:(NSString *)cacheKey {
+    [self.videoItem clearCache:cacheKey];
+    self.videoItem = nil;
+}
+
++ (void)clearVideoItem:(NSString *)cacheKey {
+    [SVGAVideoEntity clearCache:cacheKey];
+}
+
+
 - (void)clearAudios {
     for (SVGAAudioLayer *layer in self.audioLayers) {
         if (layer.audioPlaying) {
@@ -153,7 +171,7 @@
 
 - (void)stepToFrame:(NSInteger)frame andPlay:(BOOL)andPlay {
     if (self.videoItem == nil) {
-        NSLog(@"videoItem could not be nil！");
+//        NSLog(@"videoItem could not be nil！");
         return;
     } else if (self.drawLayer == nil) {
         self.videoItem = _videoItem;
@@ -167,11 +185,15 @@
     if (andPlay) {
         self.forwardAnimating = YES;
         if (self.videoItem.FPS == 0) {
-            NSLog(@"videoItem FPS could not be 0！");
+//            NSLog(@"videoItem FPS could not be 0！");
             return;
         }
         self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(next)];
-        self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+        if (@available(iOS 10.0, *)) {
+            self.displayLink.preferredFramesPerSecond = self.videoItem.FPS;
+        } else {
+            self.displayLink.frameInterval = 60 / self.videoItem.FPS;
+        }
         [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:self.mainRunLoopMode];
     }
 }
