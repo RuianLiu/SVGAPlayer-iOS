@@ -22,6 +22,8 @@
 
 #pragma mark - SVGAProtoSvgaRoot
 
+@import Darwin.libkern.OSAtomic;
+
 @implementation SVGAProtoSvgaRoot
 
 // No extensions in the file and no imports, so no need to generate
