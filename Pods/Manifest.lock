@@ -1,5 +1,5 @@
 PODS:
-  - Protobuf (3.21.1)
+  - Protobuf (3.23.4)
   - React/ART (0.45.1):
     - React/Core
   - React/Core (0.45.1):
@@ -57,11 +57,11 @@ EXTERNAL SOURCES:
     :podspec: https://raw.githubusercontent.com/yyued/react-native-runtime-ios/0.45.1/React.podspec
 
 SPEC CHECKSUMS:
-  Protobuf: 9e88c1e667d75aa2491d211f26ccddde4e8ad4cf
+  Protobuf: c6bc59bbab3d38a71c67f62d7cb7ca8f8ea4eca1
   React: 505e0132cd9aaba1a56e47ef509220dd794ec9be
   SSZipArchive: cefe1364104a0231268a5deb8495bdf2861f52f0
   Yoga: cff67a400f6b74dc38eb0bad4f156673d9aa980c
 
-PODFILE CHECKSUM: 144b5e67f10dd1c296406933a25e9036c5686225
+PODFILE CHECKSUM: cfd3fb718df490e6ab0dd538ca133cfc280c1e7e
 
 COCOAPODS: 1.10.2
