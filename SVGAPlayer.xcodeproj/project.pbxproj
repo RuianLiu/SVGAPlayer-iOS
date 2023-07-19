@@ -188,7 +188,6 @@
 				90A676E91D13A6DF008A69F3 /* Main.storyboard */,
 				90A676EC1D13A6DF008A69F3 /* Assets.xcassets */,
 				90A676EE1D13A6DF008A69F3 /* LaunchScreen.storyboard */,
-				90A676F11D13A6DF008A69F3 /* Info.plist */,
 				90CB64F81EF297E800DAA382 /* SVGAPlayer React-Info.plist */,
 				90A676E01D13A6DF008A69F3 /* Supporting Files */,
 			);
@@ -198,6 +197,7 @@
 		90A676E01D13A6DF008A69F3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				90A676F11D13A6DF008A69F3 /* Info.plist */,
 				90A676E11D13A6DF008A69F3 /* main.m */,
 			);
 			name = "Supporting Files";
