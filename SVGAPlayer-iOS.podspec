@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "SVGAPlayer-iOS"
-  s.version      = "1.1.5" # 在源代码2.5.7代码上修改
+  s.version      = "1.1.6" # 在源代码2.5.7代码上修改
   s.summary      = "SVGAPlayer 是一个高性能的动画播放器"
   s.description  = <<-DESC
                    SVGA 是一种全新的动画格式，由 YY UED 团队主导开发；
@@ -14,6 +14,12 @@ Pod::Spec.new do |s|
   s.author       = { "PonyCui" => "cuiminghui1@yy.com" }
   s.platform     = :ios, "11.0"
   s.source       = { :git => "https://github.com/RuianLiu/SVGAPlayer-iOS.git", :tag => s.version }
+    s.user_target_xcconfig = {
+    'GENERATE_INFOPLIST_FILE' => 'YES'
+  }
+  s.pod_target_xcconfig = {
+    'GENERATE_INFOPLIST_FILE' => 'YES'
+  }
   s.subspec 'Core' do |ss|
     ss.source_files  = "Source/*.{h,m}"
     ss.requires_arc = true
