@@ -14,12 +14,6 @@ Pod::Spec.new do |s|
   s.author       = { "PonyCui" => "cuiminghui1@yy.com" }
   s.platform     = :ios, "11.0"
   s.source       = { :git => "https://github.com/RuianLiu/SVGAPlayer-iOS.git", :tag => s.version }
-    s.user_target_xcconfig = {
-    'GENERATE_INFOPLIST_FILE' => 'YES'
-  }
-  s.pod_target_xcconfig = {
-    'GENERATE_INFOPLIST_FILE' => 'YES'
-  }
   s.subspec 'Core' do |ss|
     ss.source_files  = "Source/*.{h,m}"
     ss.requires_arc = true
