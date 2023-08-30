@@ -15,10 +15,10 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '11.0'
   s.source       = { :git => 'https://github.com/RuianLiu/SVGAPlayer-iOS.git', :tag => s.version.to_s }
   s.user_target_xcconfig = {
-    'GENERATE_INFOPLIST_FILE' => 'YES'
+    'GENERATE_INFOPLIST_FILE' => 'NO'
   }
   s.pod_target_xcconfig = {
-    'GENERATE_INFOPLIST_FILE' => 'YES'
+    'GENERATE_INFOPLIST_FILE' => 'NO'
   }
   s.subspec 'Core' do |ss|
     ss.source_files  = 'Source/*.{h,m}'
