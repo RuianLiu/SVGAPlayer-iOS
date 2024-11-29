@@ -250,6 +250,7 @@
                                                  options:NSStringDrawingUsesLineFragmentOrigin
                                                  context:NULL].size;
                 CATextLayer *textLayer = [CATextLayer layer];
+                textLayer.wrapped = YES;
                 textLayer.contentsScale = [[UIScreen mainScreen] scale];
                 [textLayer setString:self.dynamicTexts[sprite.imageKey]];
                 textLayer.frame = CGRectMake(0, 0, size.width, size.height);
